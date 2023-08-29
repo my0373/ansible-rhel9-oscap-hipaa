@@ -1,6 +1,9 @@
 ---
 - name: "Patch the RHEL operating system "
   hosts: all
+  vars: 
+    REBOOT_DELAY: 60
+    REBOOT_TIMEOUT_DELAY: 600
   become: yes
   tasks:
     - name: patch all kernel packages
@@ -9,14 +12,14 @@
         state: latest
     
     - name: Run the command shutdown -r now 
-      ansible.builtin.shell: sleep 5 && reboot
+      ansible.builtin.shell: reboot
       async: 1
       poll: 0
 
-    - name: Reebot the system
+    - name: Reboot the system
       ansible.builtin.wait_for_connection:
-        delay: 60
-        timeout: 600
+        delay: "{{ REBOOT_DELAY | default(60) }}"
+        timeout: "{{ REBOOT_TIMEOUT_DELAY | default(600) }}"
 
     - name: patch all other packages
       ansible.builtin.package:
@@ -24,14 +27,14 @@
         state: latest
 
     - name: Reboot the system 
-      ansible.builtin.shell: sleep 5 && reboot
+      ansible.builtin.shell: reboot
       async: 1
       poll: 0
 
     - name: wait for the system to reboot for the second time 
       ansible.builtin.wait_for_connection:
-        delay: 60
-        timeout: 600
+        delay: "{{ REBOOT_DELAY | default(60) }} "
+        timeout: "{{ REBOOT_TIMEOUT_DELAY | default(600) }}" 
 
 
 

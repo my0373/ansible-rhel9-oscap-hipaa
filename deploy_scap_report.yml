@@ -15,7 +15,7 @@
         dest: /var/www/html/index.html
 
     - name: Set the selinux context on /var/www/http/index.html
-      community.general.sefcontext:
+      community.general.system.sefcontext:
         target: /var/www/http/index.html
         setype: httpd_sys_content_t
         state: present
@@ -27,7 +27,7 @@
         dest: /var/www/html/report.html    
     
     - name: Set the selinux context on /var/www/http/index.html
-      community.general.sefcontext:
+      community.general.system.sefcontext:
         target: /var/www/http/report.html
         setype: httpd_sys_content_t
         state: present

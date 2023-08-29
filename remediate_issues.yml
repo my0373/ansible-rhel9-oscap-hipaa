@@ -1,0 +1,10 @@
+---
+- name: "Install OpenScap and its dependencies"
+  hosts: all
+  become: yes
+  tasks:
+    - name: Run all fixes
+      include_tasks: "{{ item }}"
+      with_fileglob:
+        - fixes/*.yml
+   
