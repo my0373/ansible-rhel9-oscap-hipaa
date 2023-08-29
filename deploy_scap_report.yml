@@ -14,11 +14,18 @@
         src:  /tmp/vulnerability.html
         dest: /var/www/html/index.html
 
-    - name: Copy /root/vulnerability.html to /var/www/http/index.html
+    - name: Copy /root/report.html to /var/www/http/index.html
       ansible.builtin.copy:
         remote_src: yes
         src:  /tmp/report.html
-        dest: /var/www/html/report.html    
+        dest: /var/www/html/report.html
+
+    - name: Set the selinux context on /var/www/http/index.html
+      community.general.sefcontext:
+        target: /var/www/http/report.html
+        setype: httpd_sys_content_t
+        state: present
+    
     
     - name: Open the http and https firewall ports 
       ansible.posix.firewalld:
