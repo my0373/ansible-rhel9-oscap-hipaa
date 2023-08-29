@@ -1,0 +1,37 @@
+---
+- name: "Patch the RHEL operating system "
+  hosts: all
+  become: yes
+  tasks:
+    - name: patch all kernel packages
+      ansible.builtin.package:
+        name: "*kernel*"
+        state: latest
+    
+    - name: Run the command shutdown -r now 
+      ansible.builtin.shell: sleep 5 && reboot
+      async: 1
+      poll: 0
+
+    - name: Reebot the system
+      ansible.builtin.wait_for_connection:
+        delay: 60
+        timeout: 600
+
+    - name: patch all other packages
+      ansible.builtin.package:
+        name: "*"
+        state: latest
+
+    - name: Reboot the system 
+      ansible.builtin.shell: sleep 5 && reboot
+      async: 1
+      poll: 0
+
+    - name: wait for the system to reboot for the second time 
+      ansible.builtin.wait_for_connection:
+        delay: 60
+        timeout: 600
+
+
+

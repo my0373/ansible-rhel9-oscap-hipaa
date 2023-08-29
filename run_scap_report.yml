@@ -1,0 +1,16 @@
+---
+- name: "Run an OSCAP compliance report"
+  hosts: all
+  become: yes
+  tasks:
+    - name: Run a patch vulnerability report 
+      ansible.builtin.shell:
+        chdir: /tmp
+        cmd: oscap oval eval --report vulnerability.html rhel-9.oval.xml
+      ignore_errors: true 
+    
+    - name: Run a compliance report 
+      ansible.builtin.shell:
+        chdir: /tmp
+        cmd: oscap xccdf eval --report report.html --profile hipaa /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
+      ignore_errors: true 

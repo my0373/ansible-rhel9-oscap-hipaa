@@ -1,0 +1,60 @@
+---
+- name: "Display the OSCAP content via a web server"
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install the https package 
+      ansible.builtin.package:
+        name: httpd 
+        state: latest
+
+    - name: Copy /root/vulnerability.html to /var/www/http/index.html
+      ansible.builtin.copy:
+        remote_src: yes
+        src:  /tmp/vulnerability.html
+        dest: /var/www/html/index.html
+
+    - name: Set the selinux context on /var/www/http/index.html
+      community.general.sefcontext:
+        target: /var/www/http/index.html
+        setype: httpd_sys_content_t
+        state: present
+
+    - name: Copy /root/vulnerability.html to /var/www/http/index.html
+      ansible.builtin.copy:
+        remote_src: yes
+        src:  /tmp/report.html
+        dest: /var/www/html/report.html    
+    
+    - name: Set the selinux context on /var/www/http/index.html
+      community.general.sefcontext:
+        target: /var/www/http/report.html
+        setype: httpd_sys_content_t
+        state: present
+
+    - name: Open the http and https firewall ports 
+      ansible.posix.firewalld:
+        permanent: true
+        service: "{{ item }}"
+        state: enabled
+        immediate: true
+      loop:
+        - http
+        - https
+
+    - name: Start the httpd service 
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Print a debug message with the ansible host ip address
+      ansible.builtin.debug:
+        msg: > 
+          "Patch report http://{{ ansible_host }}/index.html
+          Audit report http://{{ ansible_host }}/report.html"
+         
+  
+
+
+

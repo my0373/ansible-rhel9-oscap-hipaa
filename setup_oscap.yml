@@ -1,0 +1,39 @@
+---
+- name: "Install OpenScap and its dependencies"
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install the bzip2 package 
+      ansible.builtin.package:
+        name: bzip2
+        state: latest
+
+    - name: Install the package openscap-scanner
+      ansible.builtin.package:
+        name: openscap-scanner
+        state: latest
+    
+    - name: Install the OpenScap content for the OpenScap
+      ansible.builtin.package:
+        name: scap-security-guide
+        state: latest
+
+    - name: Install the OpenScap extensions
+      ansible.builtin.package:
+        name: openscap-engine-sce
+        state: latest
+    
+    - name: Download a file from the internet
+      ansible.builtin.get_url:
+        url: 
+          https://www.redhat.com/security/data/oval/v2/RHEL9/rhel-9.oval.xml.bz2
+        dest: /tmp/rhel-9.oval.xml.bz2
+        
+    - name: Run the shell command bzip2 --decompress > rhel-9.oval.xml 
+      ansible.builtin.shell: 
+        chdir: /tmp
+        cmd: bzip2 --decompress --keep rhel-9.oval.xml.bz2 -f > rhel-9.oval.xml
+
+
+
+
